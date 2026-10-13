@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>9-sinf Fizika — Mukammal interaktiv darslik</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#eef4f9;color:#172235}
+header{background:linear-gradient(135deg,#092b52,#0e739b 60%,#18a5a5);color:white;padding:28px 18px}
+header h1{margin:0;font-size:30px}header p{margin:8px 0 0;opacity:.92}
+nav{position:sticky;top:0;z-index:10;background:#fff;padding:10px;display:flex;gap:7px;overflow:auto;border-bottom:1px solid #d7e1e9}
+button{font:inherit}.navbtn,.btn{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+.navbtn{background:#e8f1f7;color:#16456c;white-space:nowrap}.navbtn.active,.btn{background:#11769a;color:white}
+main{max-width:1150px;margin:auto;padding:20px}.card{background:#fff;border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 7px 24px #0b315d12}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.topic{border:1px solid #dce6ee;border-radius:15px;padding:17px;background:#fbfdff;cursor:pointer;transition:.2s}.topic:hover{transform:translateY(-3px);box-shadow:0 7px 20px #1234 12%}
+h2{color:#0b4e77}h3{color:#175c7e}.badge{display:inline-block;background:#e4f4fb;color:#116485;border-radius:20px;padding:5px 9px;font-size:12px;font-weight:800}
+.formula{background:#f0f7fb;border-left:5px solid #1592ae;padding:13px;border-radius:8px;font-size:20px;margin:9px 0}.muted{color:#627384}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.tabs button{border:1px solid #d5e2ea;background:#fff;padding:9px 12px;border-radius:9px;cursor:pointer}.tabs button.on{background:#dff2f8}
+.info{background:#f7fafc;padding:14px;border-radius:12px}.quiz{margin-top:14px}.option{width:100%;display:block;text-align:left;border:1px solid #d9e3eb;background:#fff;padding:13px;margin:8px 0;border-radius:10px;cursor:pointer}.option.correct{background:#dff5e5;border-color:#51a566}.option.wrong{background:#ffe4e4;border-color:#d85a5a}
+canvas{width:100%;max-width:900px;height:300px;background:#071b2c;border-radius:14px}.meter{height:14px;background:#e1e8ee;border-radius:10px;overflow:hidden}.meter span{display:block;height:100%;background:#16a1a1;width:0}.score{font-size:22px;font-weight:800}.memory{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:620px}.tile{height:75px;border:0;border-radius:11px;background:#126f98;color:#fff;font-weight:800;cursor:pointer}
+footer{text-align:center;color:#6c7b88;padding:30px}
+</style>
+</head>
+<body>
+<header><h1>⚡ 9-SINF FIZIKA — INTERAKTIV DARSLIK</h1><p>Boblar • mavzular • formulalar • tajribalar • simulyatsiyalar • testlar • o‘yinlar</p></header>
+<nav id="nav"></nav>
+<main id="app"></main>
+<footer>Ta’limiy interaktiv loyiha • 9-sinf Fizika</footer>
+<script>
+const chapters=[
+{n:"I",name:"Modda tuzilishining molekulyar-kinetik nazariyasi asoslari",topics:[
+["Modda tuzilishining molekulyar-kinetik nazariyasi","Molekulalar, atomlar va ularning uzluksiz tartibsiz harakati. Diffuziya va Broun harakati.","Asosiy g‘oya: modda zarrachalardan tuzilgan; zarrachalar doimo harakatda va o‘zaro ta’sirlashadi."],
+["Molekulalarning massasi va o‘lchami","Molekulalarning nisbiy massasi, massasi va o‘lchamini baholash.","m₀ = M/Nₐ"],
+["Modda miqdori. Molyar massa","Mol, Avogadro doimiysi va molyar massa orasidagi bog‘lanish.","ν = m/M = N/Nₐ"],
+["Masalalar yechish","Massa, molekulalar soni va modda miqdorini hisoblashga doir masalalar.","N = νNₐ"],
+["Ideal gaz","Ideal gaz modeli va molekulalarning o‘zaro ta’siri soddalashtiriladigan shartlar.","pV = νRT"],
+["Temperatura","Temperaturaning molekulyar talqini va Kelvin shkalasi.","T = t + 273.15"],
+["Gaz molekulalarining harakat tezligi","Molekulalarning o‘rtacha kvadratik tezligi va temperatura bilan bog‘lanishi.","vᵣₘₛ = √(3RT/M)"],
+["Masalalar va nazorat","I bob bo‘yicha umumlashtiruvchi masalalar va nazorat testi.",""]]},
+{n:"II",name:"Ideal gazning molekular-kinetik nazariyasi",topics:[
+["Ideal gaz holatining tenglamasi","Bosim, hajm, temperatura va modda miqdori orasidagi bog‘lanish.","pV = νRT"],
+["Izotermik jarayon","Temperatura o‘zgarmas bo‘lganda gaz holatining o‘zgarishi.","pV = const"],
+["Izobarik jarayon","Bosim o‘zgarmas bo‘lganda hajm va temperatura munosabati.","V/T = const"],
+["Izoxorik jarayon","Hajm o‘zgarmas bo‘lganda bosim va temperatura munosabati.","p/T = const"],
+["Izojarayonlar grafiklari","p–V, V–T va p–T grafiklarini tahlil qilish.","pV/T = const"],
+["Amaliy mashg‘ulot: molekula o‘lchamini baholash","Oddiy tajriba orqali molekula o‘lchamini taxminiy aniqlash.","l = V/S"],
+["Masalalar va nazorat","Ideal gaz va izojarayonlarga oid murakkab masalalar.",""]]},
+{n:"III",name:"Suyuqlik va gazlarning bir-biriga aylanishi",topics:[
+["Bug‘lanish va kondensatsiya","Suyuqlik sirtidan molekulalarning chiqishi va bug‘ning suyuqlikka aylanishi.","Q = Lm"],
+["Qaynash","Qaynash sharti va qaynash temperaturasining bosimga bog‘liqligi.","Q = Lm"],
+["To‘yingan va to‘yinmagan bug‘","Bug‘ bosimi, dinamik muvozanat va to‘yingan bug‘ tushunchasi.","p = f(T)"],
+["Havo namligi","Mutlaq va nisbiy namlik, shudring nuqtasi.","φ = p/pₘₐₓ · 100%"],
+["Sirt taranglik","Suyuqlik sirtidagi molekulalararo kuchlar va sirt taranglik hodisasi.","F = σl"],
+["Kapillyarlik","Ingichka naylarda suyuqlikning ko‘tarilishi yoki pasayishi.","h = 2σcosθ/(ρgr)"],
+["Laboratoriya: sirt taranglik koeffitsiyenti","Tajriba natijalaridan foydalanib σ ni aniqlash.","σ = F/l"],
+["Laboratoriya: havoning nisbiy namligi","Psixrometr yoki jadval yordamida namlikni aniqlash.","φ = p/pₘₐₓ ·100%"]]},
+{n:"IV",name:"Qattiq jismlarning xossalari",topics:[
+["Qattiq jismlarning tuzilishi","Kristall va amorf jismlar, zarrachalarning joylashishi.",""],
+["Kristall panjara","Kristall tuzilish va anizotropiya haqida tushuncha.",""],
+["Mexanik xossalar","Elastiklik, plastik deformatsiya va mustahkamlik.","σ = F/S"],
+["Deformatsiya va Guk qonuni","Elastik deformatsiyada kuch va deformatsiya munosabati.","F = kΔl"]]},
+{n:"V",name:"Termodinamika asoslari",topics:[
+["Ichki energiya","Zarrachalarning kinetik va potensial energiyalari yig‘indisi.","U = U(T,V)"],
+["Ichki energiyani o‘zgartirish usullari","Ish bajarish va issiqlik uzatish orqali ichki energiyaning o‘zgarishi.","ΔU = Q − A"],
+["Issiqlik miqdori","Jismni isitish/sovitish va faza o‘zgarishidagi issiqlik.","Q = cmΔT"],
+["Termodinamikaning I qonuni","Issiqlik miqdori, ichki energiya va gaz bajargan ish.","Q = ΔU + A"],
+["Issiqlik dvigatellari","Issiqlik energiyasining mexanik ishga aylanishi.","η = A/Q₁"],
+["Laboratoriya: solishtirma issiqlik sig‘imi","Kalorimetrik usul bilan moddaning issiqlik sig‘imini aniqlash.","Q₁=Q₂"],
+["Laboratoriya: suvlarni aralashtirish","Issiqlik balansi asosida tajribani tekshirish.","Q₁+Q₂=0"]]},
+{n:"VI",name:"Optika",topics:[
+["Yorug‘likning to‘g‘ri chiziqli tarqalishi","Yorug‘lik nuri, soya va yarim soya hosil bo‘lishi.",""],
+["Yorug‘likning qaytishi","Tushish va qaytish burchaklari.","α = β"],
+["Yassi ko‘zgu","Tasvirning hosil bo‘lishi va xossalari.","dₒ=dᵢ"],
+["Yorug‘likning sinishi","Ikki muhit chegarasida nurning yo‘nalishi o‘zgarishi.","n₁sinα=n₂sinβ"],
+["Linza va uning optik kuchi","Yig‘uvchi/sochuvchi linzalar va fokus masofasi.","D = 1/F"],
+["Yupqa linza formulasi","Predmet, tasvir va fokus masofalari.","1/F=1/a+1/b"],
+["Laboratoriya: shishaning sindirish ko‘rsatkichi","Sinish burchaklarini o‘lchash va n ni hisoblash.","n=sinα/sinβ"],
+["Laboratoriya: linzaning optik kuchi","Fokus masofasini tajribada aniqlash.","D=1/F"]]},
+{n:"VII",name:"Atom va yadro fizikasi elementlari",topics:[
+["Atom tuzilishi","Atom yadrosi, proton, neytron va elektronlar.","A=Z+N"],
+["Radioaktivlik","Beqaror yadrolarning o‘z-o‘zidan nurlanishi.","N=N₀·2^(-t/T₁/₂)"],
+["Radioaktiv nurlanish turlari","α, β va γ nurlanishlarning umumiy xususiyatlari.",""],
+["Yadro reaksiyalari","Yadrolarning o‘zaro ta’siri va saqlanish qonunlari.","ΣA=const, ΣZ=const"],
+["Massa nuqsoni va bog‘lanish energiyasi","Yadro massasidagi farq va energiya bog‘lanishi.","E=Δmc²"],
+["Yadro energetikasi","Yadro energiyasidan foydalanishning fizik asoslari.","E=mc²"],
+["Radiatsion xavfsizlik","Ionlashtiruvchi nurlanishdan himoyalanishning asosiy tamoyillari.","Masofa, vaqt, ekranlash"]]}
+];
+
+const qbank=[
+["Modda miqdorining SI birligi nima?","mol","kg","Pa","J",0],
+["Avogadro doimiysi taxminan nechaga teng?","6.02×10²³ mol⁻¹","9.8","3×10⁸","1.6×10⁻¹⁹",0],
+["Izotermik jarayonda qaysi kattalik o‘zgarmas?","T","p","V","ν",0],
+["Izobarik jarayonda qaysi kattalik o‘zgarmas?","p","V","T","m",0],
+["Nisbiy namlik formulasi qaysi?","φ=p/pₘₐₓ·100%","φ=pV","φ=m/V","φ=F/l",0],
+["Sirt taranglik kuchi formulasi qaysi?","F=σl","F=ma","F=kΔl","F=pV",0],
+["Termodinamikaning I qonuniga mos ifoda qaysi?","Q=ΔU+A","Q=mc","Q=U/A","Q=p/V",0],
+["Linzaning optik kuchi nimaga teng?","D=1/F","D=F","D=a/b","D=mc²",0],
+["Yorug‘likning qaytish qonunida...","α=β","α>β","α<β","α+β=180°",0],
+["Massa va energiya bog‘lanishi qaysi formula bilan ifodalanadi?","E=mc²","E=mv","E=m/c","E=F/s",0]
+];
+
+let currentChapter=0,currentTopic=0,score=0,qi=0,gameState=[];
+function setupNav(){nav.innerHTML='<button class="navbtn active" onclick="home()">🏠 Bosh sahifa</button>'+chapters.map((c,i)=>`<button class="navbtn" onclick="chapter(${i})">${c.n}-bob</button>`).join('')+'<button class="navbtn" onclick="allQuiz()">🧠 Test markazi</button><button class="navbtn" onclick="game()">🎮 O‘yinlar</button>'}
+function home(){
+app.innerHTML=`<div class="card"><span class="badge">9-SINF • INTERAKTIV KURS</span><h2>Fizika fanini interaktiv o‘rganing</h2><p>Har bir bob ichida mavzular ketma-ketligi, nazariya, formulalar, tajriba/simulyatsiya, masala, test va o‘yin mavjud.</p><div class="grid">${chapters.map((c,i)=>`<div class="topic" onclick="chapter(${i})"><span class="badge">${c.n}-BOB</span><h3>${c.name}</h3><p>${c.topics.length} ta mavzu</p><button class="btn">Bobni ochish →</button></div>`).join('')}</div></div>
+<div class="card"><h2>🏆 Umumiy natija</h2><p class="score">${score} ball</p><div class="meter"><span style="width:${Math.min(score*3,100)}%"></span></div></div>`;
+}
+function chapter(i){
+currentChapter=i;const c=chapters[i];
+app.innerHTML=`<div class="card"><span class="badge">${c.n}-BOB</span><h2>${c.name}</h2><p class="muted">Mavzuni tanlang. Har bir mavzu ichida nazariya, formula, interaktiv model, masala va mini-test mavjud.</p>
+<div class="grid">${c.topics.map((t,j)=>`<div class="topic" onclick="lesson(${i},${j})"><span class="badge">${j+1}-mavzu</span><h3>${t[0]}</h3><p>${t[1]}</p><div class="formula">${t[2]||"Nazariy tushunchalar"}</div><button class="btn">Mavzuni o‘rganish</button></div>`).join('')}</div></div>`;
+}
+function lesson(ci,ti){
+currentChapter=ci;currentTopic=ti;let c=chapters[ci],t=c.topics[ti];
+app.innerHTML=`<div class="card"><span class="badge">${c.n}-BOB • ${ti+1}-MAVZU</span><h2>${t[0]}</h2>
+<div class="tabs"><button class="on" onclick="showSection('naz')">📖 Nazariya</button><button onclick="showSection('sim')">🔬 Simulyatsiya</button><button onclick="showSection('mas')">🧮 Masala</button><button onclick="showSection('test')">🧠 Mini-test</button></div>
+<div id="lessonBody"></div></div>`;
+showSection('naz');
+}
+function showSection(s){
+let t=chapters[currentChapter].topics[currentTopic],body=document.getElementById('lessonBody');
+if(s==='naz')body.innerHTML=`<div class="info"><h3>📖 Nazariy asos</h3><p>${t[1]}</p><p>Bu mavzuda fizik hodisaning sababini, asosiy kattaliklarini, ularning o‘lchov birliklarini va real hayotdagi qo‘llanishini tahlil qilamiz.</p><h3>📐 Asosiy formula</h3><div class="formula">${t[2]||"Mavzuga oid qonun va tushunchalarni mustaqil umumlashtiring."}</div><h3>💡 Bilish kerak</h3><ul><li>Fizik kattaliklarni SI birliklarida ifodalash.</li><li>Formuladan noma’lum kattalikni chiqarish.</li><li>Grafik va tajriba natijasini tahlil qilish.</li></ul></div>`;
+if(s==='sim')body.innerHTML=`<h3>🔬 Interaktiv fizik model</h3><canvas id="canvas" width="900" height="300"></canvas><p>Slayderni o‘zgartiring — modeldagi parametrning ta’sirini kuzating.</p><input type="range" min="5" max="95" value="50" oninput="simulate(this.value)"><b id="val">50</b><p class="muted">Bu model tushunchani vizual ko‘rsatish uchun soddalashtirilgan.</p>` ,setTimeout(()=>simulate(50),0);
+if(s==='mas')body.innerHTML=`<h3>🧮 Namunaviy masala</h3><div class="info"><b>Masala:</b> Jismning massasi 2 kg, unga 6 N kuch ta’sir qilmoqda. Tezlanishni aniqlang.</div><div class="formula">a = F/m = 6/2 = 3 m/s²</div><p><b>Javob:</b> 3 m/s².</p><button class="btn" onclick="alert('Masalani avval o‘zingiz yechib, keyin javobni tekshiring!')">Yechimni tekshirish</button>`;
+if(s==='test')body.innerHTML=`<h3>🧠 Mavzuni tekshirish</h3><p>Test markazida 10 ta aralash savol bor.</p><button class="btn" onclick="allQuiz()">Testni boshlash →</button>`;
+}
+function simulate(v){
+let c=document.getElementById('canvas');if(!c)return;document.getElementById('val').textContent=v;let x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.fillStyle="#0d7ea0";x.beginPath();x.arc(120+v*6,150,25+v/5,0,Math.PI*2);x.fill();x.strokeStyle="#73d7e9";x.lineWidth=3;for(let i=0;i<9;i++){x.beginPath();x.moveTo(500,30+i*28);x.lineTo(500+v*3,30+i*28);x.stroke()}x.fillStyle="white";x.font="18px Arial";x.fillText("Parametr: "+v,25,28);
+}
+function allQuiz(){qi=0;score=0;quizQ()}
+function quizQ(){if(qi>=qbank.length){app.innerHTML=`<div class="card"><h2>🏆 Test yakunlandi</h2><p class="score">${score}/${qbank.length} ta to‘g‘ri</p><p>${score>=9?"🌟 A’lo natija!":score>=7?"👍 Yaxshi natija!":"📚 Mavzularni yana bir bor takrorlang."}</p><button class="btn" onclick="allQuiz()">Qayta ishlash</button></div>`;return}
+let q=qbank[qi];app.innerHTML=`<div class="card"><span class="badge">SAVOL ${qi+1}/${qbank.length}</span><h2>${q[0]}</h2>${q.slice(1,5).map((a,i)=>`<button class="option" onclick="ans(${i})">${String.fromCharCode(65+i)}) ${a}</button>`).join('')}</div>`}
+function ans(i){let q=qbank[qi],bs=document.querySelectorAll('.option');bs[q[5]].classList.add('correct');if(i===q[5])score++;else bs[i].classList.add('wrong');setTimeout(()=>{qi++;quizQ()},600)}
+const pairs=[["Molyar massa","kg/mol"],["Kuch","N"],["Bosim","Pa"],["Energiya","J"],["Tok kuchi","A"],["Tezlik","m/s"],["Quvvat","W"],["Zaryad","C"]];
+function game(){gameState=[];let deck=[...pairs,...pairs].sort(()=>Math.random()-.5);app.innerHTML=`<div class="card"><h2>🎮 Fizik juftliklar</h2><p>Kattalikni unga mos birlik bilan juftlang.</p><div class="memory">${deck.map((p,i)=>`<button class="tile" onclick="pick(${i})" data-val="${p[0]}|${p[1]}">?</button>`).join('')}</div><p id="gm"></p></div>`}
+function pick(i){if(gameState.length>=2)return;let b=document.querySelectorAll('.tile')[i];if(b.textContent!=="?")return;b.textContent=b.dataset.val.split('|')[0];gameState.push(i);if(gameState.length===2){let a=document.querySelectorAll('.tile')[gameState[0]],c=document.querySelectorAll('.tile')[gameState[1]];let av=a.dataset.val.split('|'),cv=c.dataset.val.split('|');let ok=av[0]===cv[0]&&av[1]!==cv[1] || av[0]===cv[1] || av[1]===cv[0];if(ok){a.style.visibility=c.style.visibility="hidden";gm.textContent="✅ Juftlik topildi!"}else{gm.textContent="❌ Mos emas";setTimeout(()=>{a.textContent=c.textContent="?"},650)}setTimeout(()=>gameState=[],700)}}
+setupNav();home();
+</script>
+</body></html>
